@@ -1,5 +1,4 @@
-import { Component } from 'react';
-
+import React, { Component } from 'react';
 import fetchDataImage from 'servises/fetchRequaest';
 import ImageGallery from '../ImageGallery/ImageGallery';
 import SearchForm from '../SearchForm/SearchForm';
@@ -15,6 +14,8 @@ class Searchbar extends Component {
     showModal: false,
     modalImage: '',
     loader: false,
+    total: 0,
+    errorMesege: false,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -27,16 +28,23 @@ class Searchbar extends Component {
     const { query, page } = this.state;
     this.setState({ loader: true });
 
-    fetchDataImage(query, page).then(images => {
-      this.setState(prevState => ({
-        images: [...prevState.images, ...images.hits],
-        page: prevState.page + 1,
-        loader: false,
-      }));
-    });
+    fetchDataImage(query, page)
+      .then(images => {
+        this.setState(prevState => ({
+          images: [...prevState.images, ...images.hits],
+          page: prevState.page + 1,
+          loader: false,
+          total: images.total,
+          errorMesege: false
+        }));
+      })
+      .catch(() => this.setState({ errorMesege: true, loader: false }));
   };
 
   fromData = data => {
+    if (data.length === 0) {
+      return;
+    }
     this.setState({
       images: [],
       page: 1,
@@ -60,7 +68,7 @@ class Searchbar extends Component {
   };
 
   render() {
-    const { images, showModal, modalImage, page, loader } = this.state;
+    const { images, showModal, modalImage, loader, total, errorMesege } = this.state;
     return (
       <>
         <SearchForm onSubmit={this.fromData} />
@@ -71,7 +79,9 @@ class Searchbar extends Component {
             <img src={modalImage} alt="" />
           </Modal>
         )}
-        {page > 1 && <Button onClick={this.fetchImages} text="Load more" />}
+        {images.length > 0 && images.length < total && !errorMesege &&
+          <Button onClick={this.fetchImages} text="Load more" />
+        }
       </>
     );
   }

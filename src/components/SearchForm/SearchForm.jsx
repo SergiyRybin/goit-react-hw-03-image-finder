@@ -13,7 +13,7 @@ class SearchForm extends Component {
   };
 
   fromCahnge = e => {
-    const nameValue = e.currentTarget.value.toLowerCase();
+    const nameValue = e.currentTarget.value.toLowerCase().trim();
     this.setState({ image: nameValue });
   };
 

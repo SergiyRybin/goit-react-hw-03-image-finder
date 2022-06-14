@@ -9,7 +9,7 @@ function fetchDataImage(name, page) {
       return r.json();
     }
     return Promise.reject(new Error(`Error: ${r.status} ${r.statusText}`));
-  });
+  })
 }
 
 fetchDataImage.propTypes = {
